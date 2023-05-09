@@ -1,99 +1,80 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+@extends('abre_pagina')
 
-        <title>Laravel</title>
+@section('INICIA')
+   <div class="container">
+       <h1 class="display-4">Estas en el Notas</h1>
+   </div> 
 
-        <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
+{{-- En esta seccion empieza el formulario --}}
+<div class="container fluid mt-5 my-5" >
+    @if (session('Mensaje'))
+    <div class="alert alert-success" role="alert">
+        {{session('Mensaje')}}
+      </div>
+    @endif
+    <form action="{{route('crear')}}" method="POST">
+        @csrf
 
-        <!-- Styles -->
-        <style>
-            html, body {
-                background-color: #fff;
-                color: #636b6f;
-                font-family: 'Nunito', sans-serif;
-                font-weight: 200;
-                height: 100vh;
-                margin: 0;
-            }
+        @error('nombre')
+        <div class="alert alert-danger" role="alert">
+            No puedes agregar una nota sin nombre
+          </div>  
+        @enderror
+        
+        @error('descripcion')
+        <div class="alert alert-danger" role="alert">
+            No puedes agregar una nota sin descripcion
+          </div>  
+        @enderror
+        <label for="nombre">Nombre de la nota:</label>
+        <input type="text" placeholder="Ingresa nombre de nota" id="nombre" name="nombre" 
+        class="form-control mb-2" value="{{old('nombre')}}" > <br>
+        <label for="nombre">Descripción de la nota:</label>
+        <input type="text" placeholder="Ingresa descripcion de la nota" id="descripcion" 
+        name="descripcion" class="form-control mb-2"  value="{{old('descripcion')}}"><br>
+        <input type="submit" class="btn btn-block btn-primary" value="Registra nota" >
+    </form>
+</div>
 
-            .full-height {
-                height: 100vh;
-            }
 
-            .flex-center {
-                align-items: center;
-                display: flex;
-                justify-content: center;
-            }
 
-            .position-ref {
-                position: relative;
-            }
-
-            .top-right {
-                position: absolute;
-                right: 10px;
-                top: 18px;
-            }
-
-            .content {
-                text-align: center;
-            }
-
-            .title {
-                font-size: 84px;
-            }
-
-            .links > a {
-                color: #636b6f;
-                padding: 0 25px;
-                font-size: 13px;
-                font-weight: 600;
-                letter-spacing: .1rem;
-                text-decoration: none;
-                text-transform: uppercase;
-            }
-
-            .m-b-md {
-                margin-bottom: 30px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="flex-center position-ref full-height">
-            @if (Route::has('login'))
-                <div class="top-right links">
-                    @auth
-                        <a href="{{ url('/home') }}">Home</a>
-                    @else
-                        <a href="{{ route('login') }}">Login</a>
-
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}">Register</a>
-                        @endif
-                    @endauth
-                </div>
+{{-- Fin formulario --}}
+   {{-- Esta seccion se encuentra la tabla de notas --}}
+   <div class="container text-center">
+    {{$notas->links()}}
+    <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nombre de nota</th>
+            <th scope="col">Descripccion</th>
+            <th scope="col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+            @if (isset($notas))
+            @foreach ($notas as $item)
+            <tr>
+             <th scope="row">{{$item->id}}</th>
+             <td><a href="{{route('detalle',$item->id)}}"class="badge badge-primary" >{{$item->nombre}}</a></td>
+             <td>{{$item->descripcion}}</td>
+             <td><a href="{{route('editar',$item)}}" class="btn btn-warning">Editar</a>
+                <form action="{{route('eliminar',$item->id)}}" method="POST" class="d-inline">
+                  @method('DELETE')
+                  @csrf
+                  <button class="btn btn-danger" type="submit">Eliminar</button>
+                </form>
+                </td>
+              
+                
+           </tr> 
+            @endforeach
             @endif
+         
+         
+        </tbody>
+      </table>
+      
 
-            <div class="content">
-                <div class="title m-b-md">
-                    Laravel
-                </div>
-
-                <div class="links">
-                    <a href="https://laravel.com/docs">Docs</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://blog.laravel.com">Blog</a>
-                    <a href="https://nova.laravel.com">Nova</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
-                </div>
-            </div>
-        </div>
-    </body>
-</html>
+   </div>
+@endsection
